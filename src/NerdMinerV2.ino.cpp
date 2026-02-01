@@ -15,6 +15,9 @@
 #include "drivers/storage/SDCard.h"
 #include "ShaTests/nerdSHA_HWTest.h"
 #include "timeconst.h"
+#ifdef WEB_DASHBOARD
+#include "webdash.h"
+#endif
 
 #ifdef TOUCH_ENABLE
 #include "TouchHandler.h"
@@ -214,6 +217,10 @@ void loop() {
   touchHandler.isTouched();
 #endif
   wifiManagerProcess(); // avoid delays() in loop when non-blocking and other long running code
+
+#ifdef WEB_DASHBOARD
+  webDashboardProcess();
+#endif
 
   vTaskDelay(50 / portTICK_PERIOD_MS);
 }

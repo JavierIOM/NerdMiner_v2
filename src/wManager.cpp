@@ -15,6 +15,9 @@
 #include "drivers/storage/storage.h"
 #include "mining.h"
 #include "timeconst.h"
+#ifdef WEB_DASHBOARD
+#include "webdash.h"
+#endif
 
 #include <ArduinoJson.h>
 #include <esp_flash.h>
@@ -410,6 +413,12 @@ void init_WifiManager()
     Settings.invertColors = (strncmp(invertColors.getValue(), "T", 1) == 0);
     Serial.print("Invert Colors: ");
     Serial.println(Settings.invertColors);
+    #endif
+
+    #ifdef WEB_DASHBOARD
+    if (WiFi.status() == WL_CONNECTED) {
+        init_WebDashboard();
+    }
     #endif
 
     // Save the custom parameters to FS
