@@ -7,6 +7,7 @@
 #include "drivers/storage/storage.h"
 #include "drivers/storage/nvMemory.h"
 #include <ArduinoJson.h>
+#include <ESPmDNS.h>
 
 extern TSettings Settings;
 extern unsigned long start;
@@ -192,6 +193,11 @@ static void handleApiConfigPost() {
 }
 
 void init_WebDashboard() {
+    WiFi.setHostname("nerdminer");
+    if (MDNS.begin("nerdminer")) {
+        MDNS.addService("http", "tcp", 80);
+        Serial.println(">> mDNS started: http://nerdminer.local");
+    }
     dashServer.on("/", HTTP_GET, handleRoot);
     dashServer.on("/api/stats", HTTP_GET, handleApiStats);
     dashServer.on("/api/config", HTTP_POST, handleApiConfigPost);
