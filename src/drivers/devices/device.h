@@ -53,6 +53,8 @@
 #include "lilygoT_HMI.h"
 #elif defined(SPOTPEAR)
 #include "spotpearKeychain.h"
+#elif defined(FIREBEETLE_LCD)
+#include "firebeetleLCD.h"
 
 #else
 #error "No device defined"

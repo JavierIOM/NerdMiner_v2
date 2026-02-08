@@ -64,6 +64,10 @@ DisplayDriver *currentDisplayDriver = &t_hmiDisplayDriver;
 DisplayDriver *currentDisplayDriver = &sp_kcDisplayDriver;
 #endif
 
+#ifdef LCD_2004_DISPLAY
+DisplayDriver *currentDisplayDriver = &lcd2004DisplayDriver;
+#endif
+
 
 // Initialize the display
 void initDisplay()
