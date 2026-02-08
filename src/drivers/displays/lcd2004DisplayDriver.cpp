@@ -4,6 +4,7 @@
 
 #include <Arduino.h>
 #include <Wire.h>
+#include <WiFi.h>
 #include <LiquidCrystal_I2C.h>
 #include "monitor.h"
 #include "drivers/storage/storage.h"
@@ -100,6 +101,19 @@ void lcd2004_PoolScreen(unsigned long mElapsed)
     printLine(3, "Share:" + data.completedShares + " Valid:" + data.valids);
 }
 
+// Screen 3: Network info
+// WiFi: MyNetworkSSID
+// IP: 192.168.138.108
+// nerdminer.local
+// RSSI: -65 dBm
+void lcd2004_NetworkScreen(unsigned long mElapsed)
+{
+    printLine(0, "WiFi:" + WiFi.SSID());
+    printLine(1, "IP:" + WiFi.localIP().toString());
+    printLine(2, "nerdminer.local");
+    printLine(3, "RSSI:" + String(WiFi.RSSI()) + " dBm");
+}
+
 void lcd2004_DoLedStuff(unsigned long frame)
 {
     unsigned long currentMillis = millis();
@@ -135,7 +149,8 @@ void lcd2004_AnimateCurrentScreen(unsigned long frame)
 
 CyclicScreenFunction lcd2004CyclicScreens[] = {
     lcd2004_MiningScreen,
-    lcd2004_PoolScreen
+    lcd2004_PoolScreen,
+    lcd2004_NetworkScreen
 };
 
 DisplayDriver lcd2004DisplayDriver = {
