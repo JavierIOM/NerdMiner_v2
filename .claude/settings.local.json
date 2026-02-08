@@ -2,7 +2,15 @@
   "permissions": {
     "allow": [
       "Bash(pio device monitor:*)",
-      "Bash(pio device list:*)"
+      "Bash(pio device list:*)",
+      "Bash(arp:*)",
+      "Bash(findstr:*)",
+      "Bash(ping:*)",
+      "Bash(powershell -Command:*)",
+      "Bash(powershell.exe -NoProfile -Command \"Get-NetNeighbor -AddressFamily IPv4 | Where-Object {$_State -eq ''Reachable'' -or $_State -eq ''Stale''} | Format-Table IPAddress, LinkLayerAddress, State -AutoSize\")",
+      "Bash(mode)",
+      "Bash(powershell.exe -NoProfile -Command \"[System.IO.Ports.SerialPort]::GetPortNames\\(\\)\")",
+      "Bash(powershell.exe -NoProfile -Command:*)"
     ]
   }
 }
