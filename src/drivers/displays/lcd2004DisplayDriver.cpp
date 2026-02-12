@@ -17,7 +17,7 @@ static bool backlightOn = true;
 static bool ledOn = true;
 static unsigned long previousLedMillis = 0;
 static unsigned long previousScreenMillis = 0;
-#define SCREEN_CYCLE_MS 5000
+#define SCREEN_CYCLE_MS 10000
 
 // Helper to pad and print a 20-char line
 static void printLine(int row, const String& text)
