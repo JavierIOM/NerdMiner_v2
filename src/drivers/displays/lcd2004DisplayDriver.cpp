@@ -16,6 +16,8 @@ static LiquidCrystal_I2C lcd(LCD_I2C_ADDR, 20, 4);
 static bool backlightOn = true;
 static bool ledOn = true;
 static unsigned long previousLedMillis = 0;
+static unsigned long previousScreenMillis = 0;
+#define SCREEN_CYCLE_MS 5000
 
 // Helper to pad and print a 20-char line
 static void printLine(int row, const String& text)
@@ -144,7 +146,13 @@ void lcd2004_DoLedStuff(unsigned long frame)
 
 void lcd2004_AnimateCurrentScreen(unsigned long frame)
 {
-    // No animation for character LCD
+    unsigned long currentMillis = millis();
+    if (currentMillis - previousScreenMillis >= SCREEN_CYCLE_MS) {
+        previousScreenMillis = currentMillis;
+        lcd2004DisplayDriver.current_cyclic_screen =
+            (lcd2004DisplayDriver.current_cyclic_screen + 1) %
+            lcd2004DisplayDriver.num_cyclic_screens;
+    }
 }
 
 CyclicScreenFunction lcd2004CyclicScreens[] = {
