@@ -21,6 +21,41 @@ static unsigned long previousLedMillis = 0;
 static unsigned long previousScreenMillis = 0;
 #define SCREEN_CYCLE_MS 10000
 
+// Daily facts/trivia (max ~58 chars each to fit 3 lines)
+static const char* const dailyFacts[] = {
+    "A group of flamingos is called a flamboyance",
+    "Honey never spoils. 3000yr old honey is still edible",
+    "Octopuses have three hearts and blue blood",
+    "Bananas are berries but strawberries are not",
+    "The inventor of Pringles is buried in a Pringles can",
+    "Scotland's national animal is the unicorn",
+    "Sharks are older than trees",
+    "Oxford Uni is older than the Aztec Empire",
+    "A day on Venus is longer than its year",
+    "Sea otters hold hands while they sleep",
+    "The Eiffel Tower grows 6 inches in summer heat",
+    "A cloud weighs about 1.1 million pounds",
+    "The shortest war in history lasted 38 minutes",
+    "An octopus has nine brains",
+    "The first computer bug was an actual moth",
+    "There are only 21 million Bitcoin that can ever exist",
+    "The IoM TT race has run since 1907",
+    "Hot water can freeze faster than cold water",
+    "A bolt of lightning is 5x hotter than the sun",
+    "Wombat poop is cube-shaped",
+    "Cows have best friends and get stressed apart",
+    "The moon has moonquakes",
+    "Venus spins backwards compared to other planets",
+    "Astronauts grow up to 2 inches taller in space",
+    "Polar bear fur is transparent not white",
+    "A jiffy is an actual unit: 1/100th of a second",
+    "The Isle of Man has no speed limit on some roads",
+    "There are more possible chess games than atoms",
+    "Cleopatra lived closer to WiFi than the pyramids",
+    "Bitcoin mining difficulty adjusts every 2016 blocks",
+};
+#define NUM_DAILY_FACTS (sizeof(dailyFacts) / sizeof(dailyFacts[0]))
+
 // Weather data
 static float weatherTemp = 0;
 static float weatherWind = 0;
@@ -85,6 +120,28 @@ static void printLine(int row, const String& text)
     lcd.print(padded.substring(0, 20));
 }
 
+// Word-wrap text across LCD lines (up to 3 lines of 20 chars)
+static void printWrapped(int startRow, const char* text, int maxLines)
+{
+    String str(text);
+    for (int line = 0; line < maxLines; line++) {
+        if (str.length() == 0) {
+            printLine(startRow + line, "");
+            continue;
+        }
+        if (str.length() <= 20) {
+            printLine(startRow + line, str);
+            str = "";
+            continue;
+        }
+        int cut = 20;
+        while (cut > 0 && str[cut] != ' ') cut--;
+        if (cut == 0) cut = 20;
+        printLine(startRow + line, str.substring(0, cut));
+        str = str.substring(cut + (str[cut] == ' ' ? 1 : 0));
+    }
+}
+
 void lcd2004_Init(void)
 {
     Wire.begin(SDA_PIN, SCL_PIN);
@@ -114,10 +171,12 @@ void lcd2004_AlternateRotation(void)
 void lcd2004_LoadingScreen(void)
 {
     lcd.clear();
-    lcd.setCursor(3, 1);
+    lcd.setCursor(4, 0);
     lcd.print("NerdMiner v2");
-    lcd.setCursor(4, 2);
+    lcd.setCursor(4, 1);
     lcd.print("Starting...");
+    lcd.setCursor(1, 3);
+    lcd.print("by Javier & Claude");
 }
 
 void lcd2004_SetupScreen(void)
@@ -204,6 +263,24 @@ void lcd2004_WeatherScreen(unsigned long mElapsed)
     }
 }
 
+// Screen 5: Daily fact/trivia
+// == Daily Fact ==
+// (word-wrapped text
+//  across 3 lines)
+void lcd2004_FactScreen(unsigned long mElapsed)
+{
+    clock_data cData = getClockData(mElapsed);
+    // Pick fact based on date string hash so it changes daily
+    unsigned long hash = 5381;
+    for (unsigned int i = 0; i < cData.currentDate.length(); i++) {
+        hash = hash * 33 + cData.currentDate[i];
+    }
+    int idx = hash % NUM_DAILY_FACTS;
+
+    printLine(0, "== Daily Fact ==");
+    printWrapped(1, dailyFacts[idx], 3);
+}
+
 void lcd2004_DoLedStuff(unsigned long frame)
 {
     unsigned long currentMillis = millis();
@@ -247,7 +324,8 @@ CyclicScreenFunction lcd2004CyclicScreens[] = {
     lcd2004_MiningScreen,
     lcd2004_PoolScreen,
     lcd2004_NetworkScreen,
-    lcd2004_WeatherScreen
+    lcd2004_WeatherScreen,
+    lcd2004_FactScreen
 };
 
 DisplayDriver lcd2004DisplayDriver = {
